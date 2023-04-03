@@ -90,6 +90,14 @@ async function handleSubmitBtnClick(e) {
     gallery.refresh();
 
     refs.spinIconEl.classList.remove('animation-spin');
+
+    if ((pixabayApi.page - 1) * 40 >= totalHits) {
+      Notiflix.Notify.info(
+        `We're sorry, but you've reached the end of search results.`
+      );
+      refs.loadMoreBtn.classList.add('is-hidden');
+      return;
+    }
   }
 }
 
