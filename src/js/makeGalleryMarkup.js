@@ -1,5 +1,5 @@
-export function makeGalleryMarkup(imageArray) {
-  return imageArray
+export function makeGalleryMarkup(hits) {
+  return hits
     .map(
       ({
         webformatURL,
