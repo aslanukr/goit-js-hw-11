@@ -1,0 +1,17 @@
+$indent: 20px;
+
+.is-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card-set {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $indent;
+}
+
+@mixin card-set__item($items) {
+  width: calc((100% - #{$indent} * (#{$items} - 1)) / (#{$items}));
+}

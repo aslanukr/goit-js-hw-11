@@ -10,9 +10,18 @@
 }
 
 .logo-text {
+  position: relative;
   font-size: 40px;
   font-weight: 600;
   color: #ffffff;
+
+  &::after {
+    position: absolute;
+    top: 41px;
+    left: 19px;
+    content: 'owered by Pixabay.com';
+    font-size: 8px;
+  }
 }
 
 .logo-dot {
