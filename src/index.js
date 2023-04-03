@@ -36,7 +36,7 @@ async function handleSubmitBtnClick(e) {
     const galleryMarkup = makeGalleryMarkup(imageArray);
 
     refs.galleryEl.insertAdjacentHTML('beforeend', galleryMarkup);
-  } catch {
+  } catch (error) {
     console.log(error);
   }
 
