@@ -17,14 +17,30 @@ refs.searchForm.addEventListener('submit', handleSubmitBtnClick);
 
 async function handleSubmitBtnClick(e) {
   e.preventDefault();
-  const searchQuery = e.target.elements['searchQuery'].value.trim();
-  const searchResults = await fetchPics(searchQuery);
 
-  const imageArray = searchResults.data.hits;
+  refs.galleryEl.innerHTML = '';
 
-  const galleryMarkup = makeGalleryMarkup(imageArray);
+  try {
+    const searchQuery = e.target.elements['searchQuery'].value.trim();
+    const searchResults = await fetchPics(searchQuery);
 
-  refs.galleryEl.insertAdjacentHTML('beforeend', galleryMarkup);
+    const imageArray = searchResults.data.hits;
+
+    if (imageArray.length === 0) {
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      return;
+    }
+
+    const galleryMarkup = makeGalleryMarkup(imageArray);
+
+    refs.galleryEl.insertAdjacentHTML('beforeend', galleryMarkup);
+  } catch {
+    console.log(error);
+  }
+
+  refs.searchForm.reset();
 
   let gallery = new SimpleLightbox('.gallery a', {
     captionsData: 'alt',
