@@ -10,7 +10,6 @@ export async function fetchPics(searchQuery) {
     orientation: 'horizontal',
     safesearch: 'true',
     per_page: '40',
-    page: this.page,
   });
 
   console.log(searchParams);
