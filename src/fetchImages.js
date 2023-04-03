@@ -12,7 +12,6 @@ export async function fetchPics(searchQuery) {
     per_page: '40',
   });
 
-  console.log(searchParams);
   return await axios.get(`${BASE_URL}/?${searchParams}`);
 }
 
