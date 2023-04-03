@@ -10,17 +10,18 @@ const refs = {
   searchForm: document.querySelector('.search-form'),
   loadMoreBtn: document.querySelector('.load-more'),
   galleryEl: document.querySelector('.gallery'),
+  spinIconEl: document.querySelector('.spinner-icon'),
 };
 
 refs.searchForm.addEventListener('submit', handleSubmitBtnClick);
 
 async function handleSubmitBtnClick(e) {
   e.preventDefault();
+  const pixabayApi = new PixabayApiService();
 
   refs.loadMoreBtn.classList.add(`is-hidden`);
   refs.galleryEl.innerHTML = '';
-
-  const pixabayApi = new PixabayApiService();
+  pixabayApi.page = 1;
 
   pixabayApi.query = e.currentTarget.elements.searchQuery.value.trim();
 
@@ -51,26 +52,45 @@ async function handleSubmitBtnClick(e) {
     Notiflix.Notify.success(`Hooray! We found ${totalHits} images!`);
     pixabayApi.totalHits = totalHits;
   }
-  pixabayApi.incrementPage();
 
   const galleryMarkup = makeGalleryMarkup(hits);
 
   markUpGallery(galleryMarkup);
 
-  refs.loadMoreBtn.classList.remove(`is-hidden`);
-
-  // refs.loadMoreBtn.addEventListener('click', handleLoadMore);
-
-  // async function handleLoadMore() {
-  //   console.log(pixabayApi.fetchImages.searchParams);
-  // }
+  pixabayApi.incrementPage();
 
   const gallery = new SimpleLightbox('.gallery a', {
     captionsData: 'alt',
     captionDelay: 250,
   });
-
   gallery.refresh();
+
+  refs.loadMoreBtn.classList.remove(`is-hidden`);
+
+  refs.loadMoreBtn.addEventListener('click', handleLoadMore);
+
+  async function handleLoadMore() {
+    refs.spinIconEl.classList.add('animation-spin');
+    const loadMoreResults = await pixabayApi
+      .fetchImages()
+      .then(res => {
+        return res;
+      })
+      .catch(console.log);
+
+    const {
+      data: { totalHits, hits },
+    } = loadMoreResults;
+
+    const loadMoreMarkup = makeGalleryMarkup(hits);
+    markUpGallery(loadMoreMarkup);
+
+    pixabayApi.incrementPage();
+
+    gallery.refresh();
+
+    refs.spinIconEl.classList.remove('animation-spin');
+  }
 }
 
 function markUpGallery(galleryMarkup) {
