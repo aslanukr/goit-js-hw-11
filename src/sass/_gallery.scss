@@ -43,7 +43,7 @@
     @include card-set__item(2);
   }
 
-  @media screen and (min-width: 1200px) {
+  @media screen and (min-width: 1300px) {
     @include card-set__item(4);
   }
 
@@ -58,7 +58,7 @@
   display: flex;
   justify-content: space-around;
 
-  padding: 20px 20px;
+  padding: 20px 0px;
 }
 
 .info-item {

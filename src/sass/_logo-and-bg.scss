@@ -1,7 +1,11 @@
 .logo-wrapper {
-  margin-left: 50px;
-  display: flex;
-  align-items: baseline;
+  margin-left: 25px;
+  @media screen and (min-width: 468px) {
+    display: block;
+    margin-left: 50px;
+    display: flex;
+    align-items: baseline;
+  }
 }
 
 .logo {
