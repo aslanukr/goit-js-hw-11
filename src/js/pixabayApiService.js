@@ -20,8 +20,9 @@ export default class PixabayApiService {
       per_page: 40,
       page: this.page,
     });
-
-    return await axios.get(`${this.#BASE_URL}/?${searchParams}`);
+    const { data } = await axios.get(`${this.#BASE_URL}/?${searchParams}`);
+    this.incrementPage();
+    return data;
   }
 
   incrementPage() {

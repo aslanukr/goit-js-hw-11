@@ -33,7 +33,6 @@ async function handleSubmitBtnClick(e) {
 
   refs.galleryEl.innerHTML = '';
   pixabayApi.resetPageCount();
-  pixabayApi.query = null;
 
   // =============== SEARCH HANDLING =====================
 
@@ -44,64 +43,49 @@ async function handleSubmitBtnClick(e) {
     return;
   }
 
-  const searchResults = await pixabayApi
-    .fetchImages()
-    .then(res => {
-      return res;
-    })
-    .catch(console.log);
+  try {
+    const { totalHits, hits } = await pixabayApi.fetchImages();
 
-  const {
-    data: { totalHits, hits },
-  } = searchResults;
+    if (totalHits === 0) {
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      return;
+    }
 
-  if (totalHits === 0) {
-    Notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
-    return;
+    if (pixabayApi.page === 1) {
+      Notiflix.Notify.success(`Hooray! We found ${totalHits} images!`);
+    }
+
+    pixabayApi.totalHits = totalHits;
+
+    // =============== GALLERY MARKUP =====================
+
+    const galleryMarkup = await makeGalleryMarkup(hits);
+
+    markUpGallery(galleryMarkup);
+
+    gallery.refresh();
+
+    if (totalHits > hits.length) {
+      refs.loadMoreBtn.classList.remove(`is-hidden`);
+    }
+  } catch (err) {
+    console.log(err);
   }
+}
+// =============== LOAD MORE BTN FUNCTIONALITY =====================
 
-  if (pixabayApi.page === 1) {
-    Notiflix.Notify.success(`Hooray! We found ${totalHits} images!`);
-  }
+refs.loadMoreBtn.addEventListener('click', handleLoadMore);
 
-  pixabayApi.totalHits = totalHits;
+async function handleLoadMore() {
+  refs.spinIconEl.classList.add('animation-spin');
 
-  // =============== GALLERY MARKUP =====================
+  try {
+    const { totalHits, hits } = await pixabayApi.fetchImages();
 
-  const galleryMarkup = makeGalleryMarkup(hits);
-
-  markUpGallery(galleryMarkup);
-
-  pixabayApi.incrementPage();
-  gallery.refresh();
-
-  // =============== LOAD MORE BTN FUNCTIONALITY =====================
-
-  if (totalHits > hits.length) {
-    refs.loadMoreBtn.classList.remove(`is-hidden`);
-  }
-
-  refs.loadMoreBtn.addEventListener('click', handleLoadMore);
-
-  async function handleLoadMore() {
-    refs.spinIconEl.classList.add('animation-spin');
-    const loadMoreResults = await pixabayApi
-      .fetchImages()
-      .then(res => {
-        return res;
-      })
-      .catch(console.log);
-
-    const {
-      data: { totalHits, hits },
-    } = loadMoreResults;
-
-    const loadMoreMarkup = makeGalleryMarkup(hits);
+    const loadMoreMarkup = await makeGalleryMarkup(hits);
     markUpGallery(loadMoreMarkup);
-
-    pixabayApi.incrementPage();
 
     gallery.refresh();
 
@@ -113,12 +97,14 @@ async function handleSubmitBtnClick(e) {
       );
       refs.loadMoreBtn.classList.add('is-hidden');
     }
+  } catch (err) {
+    console.log(err);
   }
 }
 
 // =============== GALLERY MARKING UP FUNCTION =====================
 
-function markUpGallery(galleryMarkup) {
-  refs.galleryEl.insertAdjacentHTML('beforeend', galleryMarkup);
+function markUpGallery(markup) {
+  refs.galleryEl.insertAdjacentHTML('beforeend', markup);
   refs.searchForm.reset();
 }

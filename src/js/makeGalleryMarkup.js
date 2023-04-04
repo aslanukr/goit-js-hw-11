@@ -1,5 +1,5 @@
-export function makeGalleryMarkup(hits) {
-  return hits
+export async function makeGalleryMarkup(hits) {
+  return await hits
     .map(
       ({
         webformatURL,
