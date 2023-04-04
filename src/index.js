@@ -1,10 +1,11 @@
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import axios from 'axios';
 import Notiflix from 'notiflix';
 
 import PixabayApiService from './js/pixabayApiService';
 import { makeGalleryMarkup } from './js/makeGalleryMarkup';
+
+// =============== REFS =====================
 
 const refs = {
   searchForm: document.querySelector('.search-form'),
@@ -13,15 +14,28 @@ const refs = {
   spinIconEl: document.querySelector('.spinner-icon'),
 };
 
+const pixabayApi = new PixabayApiService();
+
+const gallery = new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
+// =============== ON SUBMIT =====================
+
 refs.searchForm.addEventListener('submit', handleSubmitBtnClick);
 
 async function handleSubmitBtnClick(e) {
   e.preventDefault();
-  const pixabayApi = new PixabayApiService();
+
+  // =============== SEARCH RESET =====================
 
   refs.loadMoreBtn.classList.add(`is-hidden`);
+
   refs.galleryEl.innerHTML = '';
-  pixabayApi.page = 1;
+  pixabayApi.resetPageCount();
+  pixabayApi.query = null;
+
+  // =============== SEARCH HANDLING =====================
 
   pixabayApi.query = e.currentTarget.elements.searchQuery.value.trim();
 
@@ -50,22 +64,24 @@ async function handleSubmitBtnClick(e) {
 
   if (pixabayApi.page === 1) {
     Notiflix.Notify.success(`Hooray! We found ${totalHits} images!`);
-    pixabayApi.totalHits = totalHits;
   }
+
+  pixabayApi.totalHits = totalHits;
+
+  // =============== GALLERY MARKUP =====================
 
   const galleryMarkup = makeGalleryMarkup(hits);
 
   markUpGallery(galleryMarkup);
 
   pixabayApi.incrementPage();
-
-  const gallery = new SimpleLightbox('.gallery a', {
-    captionsData: 'alt',
-    captionDelay: 250,
-  });
   gallery.refresh();
 
-  refs.loadMoreBtn.classList.remove(`is-hidden`);
+  // =============== LOAD MORE BTN FUNCTIONALITY =====================
+
+  if (totalHits > hits.length) {
+    refs.loadMoreBtn.classList.remove(`is-hidden`);
+  }
 
   refs.loadMoreBtn.addEventListener('click', handleLoadMore);
 
@@ -91,18 +107,18 @@ async function handleSubmitBtnClick(e) {
 
     refs.spinIconEl.classList.remove('animation-spin');
 
-    if ((pixabayApi.page - 1) * 40 >= totalHits) {
+    if ((pixabayApi.page - 1) * 40 >= pixabayApi.totalHits) {
       Notiflix.Notify.info(
         `We're sorry, but you've reached the end of search results.`
       );
       refs.loadMoreBtn.classList.add('is-hidden');
-      return;
     }
   }
 }
+
+// =============== GALLERY MARKING UP FUNCTION =====================
 
 function markUpGallery(galleryMarkup) {
   refs.galleryEl.insertAdjacentHTML('beforeend', galleryMarkup);
   refs.searchForm.reset();
 }
-// function handleLoadMore(e) {}
