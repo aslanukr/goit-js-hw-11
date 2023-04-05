@@ -45,6 +45,7 @@ async function handleSubmitBtnClick(e) {
 
   try {
     const { totalHits, hits } = await pixabayApi.fetchImages();
+    pixabayApi.totalHits = totalHits;
 
     if (totalHits === 0) {
       Notiflix.Notify.failure(
@@ -57,7 +58,7 @@ async function handleSubmitBtnClick(e) {
       Notiflix.Notify.success(`Hooray! We found ${totalHits} images!`);
     }
 
-    pixabayApi.totalHits = totalHits;
+    pixabayApi.incrementPage();
 
     // =============== GALLERY MARKUP =====================
 
@@ -83,6 +84,8 @@ async function handleLoadMore() {
 
   try {
     const { totalHits, hits } = await pixabayApi.fetchImages();
+
+    pixabayApi.incrementPage();
 
     const loadMoreMarkup = await makeGalleryMarkup(hits);
     markUpGallery(loadMoreMarkup);

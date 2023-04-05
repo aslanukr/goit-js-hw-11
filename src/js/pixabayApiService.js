@@ -21,7 +21,6 @@ export default class PixabayApiService {
       page: this.page,
     });
     const { data } = await axios.get(`${this.#BASE_URL}/?${searchParams}`);
-    this.incrementPage();
     return data;
   }
 
